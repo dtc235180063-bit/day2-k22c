@@ -1,0 +1,114 @@
+@using Day2.Models
+@{
+    ViewData["Title"] = "Demo View Component & Partial View";
+
+    // Dữ liệu mẫu chỉ định từ View cha để minh họa cho Partial View
+    var sampleMovie = new Movie
+    {
+        Id = 99,
+        Title = "Doraemon: Stand By Me (Dữ liệu từ View cha)",
+        ReleaseDate = DateTime.Now,
+        Genre = "Hoạt hình / Gia đình",
+        Price = 75000
+    };
+}
+
+<div class="container py-3">
+    <!-- Header banner -->
+    <div class="p-4 mb-4 bg-light rounded-3 shadow-sm border">
+        <h1 class="display-6 fw-bold text-primary">Bài Thêm: Tìm Hiểu View Component & Partial View</h1>
+        <p class="lead text-secondary mb-0">
+            Dự án ASP.NET Core MVC: Minh họa trực quan cách hoạt động, so sánh và thực hành tích hợp cả <strong>View Component</strong> và <strong>Partial View</strong>.
+        </p>
+    </div>
+
+    <!-- Section 1: So sánh nhanh lý thuyết -->
+    <div class="card mb-4 shadow-sm border-secondary">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">📌 1. So Sánh Nhanh: Partial View vs View Component</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 20%;">Tiêu chí</th>
+                            <th style="width: 40%;" class="text-primary">Partial View</th>
+                            <th style="width: 40%;" class="text-success">View Component</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Bản chất</strong></td>
+                            <td>Chỉ là file Razor HTML (.cshtml), không có class C# riêng đi kèm.</td>
+                            <td>Bao gồm cả một class C# xử lý logic riêng (Controller mini) và file Razor HTML.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Xử lý dữ liệu (Logic)</strong></td>
+                            <td>Phụ thuộc hoàn toàn vào dữ liệu do View cha hoặc Controller cha truyền xuống.</td>
+                            <td>Tự trị (Autonomous): Tự query dữ liệu, tự gọi Service/Database qua Dependency Injection.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Cách gọi trong Razor</strong></td>
+                            <td>
+                                <code>&lt;partial name="_Name" model="data" /&gt;</code><br />
+                                hoặc <code>@@await Html.PartialAsync(...)</code>
+                            </td>
+                            <td>
+                                <code>&lt;vc:top-movies count="3" /&gt;</code> (Tag Helper)<br />
+                                hoặc <code>@@await Component.InvokeAsync(...)</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><strong>Trường hợp sử dụng</strong></td>
+                            <td>Hiển thị các khối giao diện lặp lại: Card sản phẩm, thanh phân trang, banner...</td>
+                            <td>Các widget UI phức tạp: Menu động, Giỏ hàng mini, Top sản phẩm bán chạy, Box tin tức...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section 2: Demo View Component gọi bằng Tag Helper -->
+    <div class="mb-5">
+        <div class="d-flex align-items-center mb-2">
+            <span class="badge bg-success fs-6 me-2">Demo 1</span>
+            <h4 class="mb-0 text-success">Gọi View Component bằng Tag Helper: <code>&lt;vc:top-movies&gt;</code></h4>
+        </div>
+        <p class="text-muted small">
+            Đoạn code gọi: <code>&lt;vc:top-movies count="3" genre="Khoa học" /&gt;</code>. View Component tự xử lý logic lọc thể loại và giới hạn 3 phim mà Controller cha không cần can thiệp!
+        </p>
+
+        <!-- Gọi View Component bằng Tag Helper -->
+        <vc:top-movies count="3" genre="Khoa học"></vc:top-movies>
+    </div>
+
+    <!-- Section 3: Demo View Component gọi bằng cú pháp C# InvokeAsync -->
+    <div class="mb-5">
+        <div class="d-flex align-items-center mb-2">
+            <span class="badge bg-info text-dark fs-6 me-2">Demo 2</span>
+            <h4 class="mb-0 text-info text-dark">Gọi View Component bằng <code>Component.InvokeAsync</code></h4>
+        </div>
+        <p class="text-muted small">
+            Đoạn code gọi: <code>@@await Component.InvokeAsync("TopMovies", new { count = 2 })</code>. Lấy 2 phim đầu tiên bất kỳ.
+        </p>
+
+        <!-- Gọi View Component bằng Razor C# -->
+        @await Component.InvokeAsync("TopMovies", new { count = 2 })
+    </div>
+
+    <!-- Section 4: Demo Partial View đơn lẻ -->
+    <div class="mb-4">
+        <div class="d-flex align-items-center mb-2">
+            <span class="badge bg-warning text-dark fs-6 me-2">Demo 3</span>
+            <h4 class="mb-0 text-warning text-dark">Gọi Partial View Đơn Lẻ: <code>&lt;partial name="_MovieCardPartial"&gt;</code></h4>
+        </div>
+        <p class="text-muted small">
+            Khác với View Component, Partial View bắt buộc phải có đối tượng <code>model</code> được View cha chuẩn bị và truyền vào:
+        </p>
+        <div class="row row-cols-1 row-cols-md-3">
+            <partial name="_MovieCardPartial" model="sampleMovie" />
+        </div>
+    </div>
+</div>
